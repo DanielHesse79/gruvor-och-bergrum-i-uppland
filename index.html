@@ -290,11 +290,16 @@ function renderChips(){
   amclear.style.display = active.size? 'block':'none';
 }
 function applyFilter(){
+  const groups=[layers.malm,layers.industri,layers.sten,layers.aktiv];
+  const onMap=groups.map(g=>map.hasLayer(g));
+  groups.forEach((g,i)=>{ if(onMap[i]) map.removeLayer(g); });
   sguIndex.forEach(e=>{
-    const show = active.size===0 || [...e.coms].some(c=>active.has(c));
+    if(!e.arr) e.arr=[...e.coms];
+    const show = active.size===0 || e.arr.some(c=>active.has(c));
     if(show){ if(!e.grp.hasLayer(e.m)) e.grp.addLayer(e.m); }
-    else { if(e.grp.hasLayer(e.m)) e.grp.removeLayer(e.m); }
+    else if(e.grp.hasLayer(e.m)) e.grp.removeLayer(e.m);
   });
+  groups.forEach((g,i)=>{ if(onMap[i]) g.addTo(map); });
 }
 amclear.onclick=()=>{ active.clear(); applyFilter(); renderChips(); };
 let amOpen=true;
